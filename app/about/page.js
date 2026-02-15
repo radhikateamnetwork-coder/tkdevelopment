@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { ArrowRight, Users, Target, Award, Heart, CheckCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import Logo from '@/components/layout/Logo'
 
 export const metadata = {
   title: 'About Us | Tushar - Web Design & Development',
@@ -69,7 +70,7 @@ export default function AboutPage() {
         <div className="container-custom">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-6">
-              <h1 className="heading-1">About <span className="text-primary">Tushar</span></h1>
+              <h1 className="heading-1">About <span className="text-primary">TK Development</span></h1>
               <p className="body-large text-muted-foreground">
                 We are a team of passionate designers and developers based in Delhi, dedicated to building exceptional digital products that help businesses succeed online.
               </p>

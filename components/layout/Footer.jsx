@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import Logo from './Logo'
 
 const footerLinks = {
   services: [
@@ -69,10 +70,10 @@ export default function Footer() {
           {/* Brand */}
           <div className="lg:col-span-2">
             <Link href="/" className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <Code2 className="w-6 h-6 text-white" />
+              <div className="w-10 h-10 flex items-center justify-center">
+                             <Logo size={280} />
               </div>
-              <span className="text-xl font-bold text-white font-[Poppins]">MyRadhika</span>
+              <span className="text-xl font-bold text-white font-[Poppins]">Developments</span>
             </Link>
             <p className="text-slate-400 mb-6 max-w-sm">
               We build modern, fast, and SEO-optimized websites that help your business grow. Expert design and development services tailored to your needs.

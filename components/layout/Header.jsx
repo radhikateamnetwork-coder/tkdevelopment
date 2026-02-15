@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Menu, X, Code2, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Logo from "@/components/layout/Logo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,10 +58,10 @@ export default function Header() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <Code2 className="w-6 h-6 text-white" />
+            <div className="w-16 h-16  flex items-center justify-center">
+             <Logo size={180} />
             </div>
-            <span className="text-xl font-bold text-foreground font-[Poppins]">MyRadhika</span>
+            <span className="text-xl font-bold text-foreground font-[Poppins]"></span>
           </Link>
 
           {/* Desktop Navigation */}
