@@ -1,5 +1,3 @@
-'use client'
-
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, CheckCircle, Star, Users, Briefcase, Trophy, Palette, ShoppingCart, TrendingUp, Code } from 'lucide-react'
@@ -122,6 +120,7 @@ export default function Home() {
                 </Button>
               </div>
               
+
               <div className="flex items-center gap-8 pt-4">
                 {stats.slice(0, 3).map((stat) => (
                   <div key={stat.label} className="text-center">
@@ -185,6 +184,7 @@ export default function Home() {
                     alt={service.title}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                   <div className="absolute bottom-4 left-4">
