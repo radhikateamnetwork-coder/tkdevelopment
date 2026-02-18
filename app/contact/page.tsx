@@ -17,6 +17,25 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 
+/* ---------------- TYPES ---------------- */
+
+interface ContactFormData {
+  name: string
+  email: string
+  phone: string
+  service: string
+  subject: string
+  message: string
+  website: string
+}
+
+interface ApiResponse {
+  success?: boolean
+  error?: string
+}
+
+/* ---------------- DATA ---------------- */
+
 const contactInfo = [
   {
     icon: MapPin,
@@ -50,25 +69,41 @@ const services = [
   'Other',
 ]
 
+/* ---------------- PAGE ---------------- */
+
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
     phone: '',
     service: '',
     subject: '',
     message: '',
-    website: '', // Honeypot field
+    website: '',
   })
-  const [loading, setLoading] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
 
-  const handleChange = (e) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+  const [loading, setLoading] = useState<boolean>(false)
+  const [submitted, setSubmitted] = useState<boolean>(false)
+
+  /* ---------- CHANGE HANDLER ---------- */
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const name = e.target.name as keyof ContactFormData
+    const value = e.target.value
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }))
   }
 
-  const handleSubmit = async (e) => {
+  /* ---------- SUBMIT HANDLER ---------- */
+
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault()
     setLoading(true)
 
@@ -79,20 +114,29 @@ export default function ContactPage() {
         body: JSON.stringify(formData),
       })
 
-      const data = await res.json()
+      let data: ApiResponse | null = null
+
+      try {
+        data = await res.json()
+      } catch {
+        data = null
+      }
 
       if (res.ok) {
         setSubmitted(true)
         toast.success('Message sent successfully!')
       } else {
-        toast.error(data.error || 'Failed to send message')
+        toast.error(data?.error || 'Failed to send message')
       }
     } catch (err) {
+      console.error(err)
       toast.error('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
+
+  /* ---------- SUCCESS STATE ---------- */
 
   if (submitted) {
     return (
@@ -102,10 +146,13 @@ export default function ContactPage() {
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
+
             <h1 className="heading-2 mb-4">Thank You!</h1>
+
             <p className="text-muted-foreground mb-8">
               Your message has been received. We'll get back to you within 24 hours.
             </p>
+
             <Button asChild>
               <Link href="/">Back to Home</Link>
             </Button>
@@ -115,13 +162,19 @@ export default function ContactPage() {
     )
   }
 
+  /* ---------- MAIN PAGE ---------- */
+
   return (
     <div className="flex flex-col pt-20">
-      {/* Hero */}
+
+      {/* HERO */}
       <section className="py-24 bg-gradient-to-br from-primary/5 via-background to-accent/5">
         <div className="container-custom">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="heading-1 mb-6">Let's Work <span className="text-primary">Together</span></h1>
+            <h1 className="heading-1 mb-6">
+              Let's Work <span className="text-primary">Together</span>
+            </h1>
+
             <p className="body-large text-muted-foreground">
               Ready to start your next project? Fill out the form below and we'll get back to you within 24 hours.
             </p>
@@ -129,171 +182,118 @@ export default function ContactPage() {
         </div>
       </section>
 
-      {/* Contact Form & Info */}
+      {/* FORM + INFO */}
       <section className="py-24">
-        <div className="container-custom">
-          <div className="grid lg:grid-cols-3 gap-12">
-            {/* Contact Info */}
-            <div className="space-y-6">
-              <h2 className="heading-3 mb-8">Contact Information</h2>
-              
-              {contactInfo.map((item) => (
-                <Card key={item.title}>
-                  <CardContent className="p-4 flex items-start gap-4">
-                    <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <item.icon className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-1">{item.title}</h3>
-                      {item.href ? (
-                        <a href={item.href} className="text-muted-foreground hover:text-primary transition-colors">
-                          {item.content}
-                        </a>
-                      ) : (
-                        <p className="text-muted-foreground">{item.content}</p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+        <div className="container-custom grid lg:grid-cols-3 gap-12">
 
-              {/* Map placeholder */}
-              <div className="aspect-video bg-muted rounded-xl flex items-center justify-center">
-                <p className="text-muted-foreground text-sm">Map Integration Available</p>
-              </div>
-            </div>
+          {/* CONTACT INFO */}
+          <div className="space-y-6">
+            <h2 className="heading-3 mb-8">Contact Information</h2>
 
-            {/* Contact Form */}
-            <div className="lg:col-span-2">
-              <Card>
-                <CardContent className="p-8">
-                  <h2 className="heading-3 mb-6">Send us a Message</h2>
-                  
-                  <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Honeypot field - hidden from users */}
-                    <input
-                      type="text"
-                      name="website"
-                      value={formData.website}
-                      onChange={handleChange}
-                      className="hidden"
-                      tabIndex={-1}
-                      autoComplete="off"
-                    />
-                    
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="name">Name *</Label>
-                        <Input
-                          id="name"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleChange}
-                          placeholder="Your name"
-                          required
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email *</Label>
-                        <Input
-                          id="email"
-                          name="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={handleChange}
-                          placeholder="your@email.com"
-                          required
-                        />
-                      </div>
-                    </div>
+            {contactInfo.map((item) => (
+              <Card key={item.title}>
+                <CardContent className="p-4 flex items-start gap-4">
+                  <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <item.icon className="w-6 h-6 text-primary" />
+                  </div>
 
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <Label htmlFor="phone">Phone</Label>
-                        <Input
-                          id="phone"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleChange}
-                          placeholder="+91 98765 43210"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="service">Service Interested In</Label>
-                        <Select
-                          value={formData.service}
-                          onValueChange={(value) => setFormData((prev) => ({ ...prev, service: value }))}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a service" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {services.map((service) => (
-                              <SelectItem key={service} value={service}>
-                                {service}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                  <div>
+                    <h3 className="font-semibold mb-1">{item.title}</h3>
 
-                    <div className="space-y-2">
-                      <Label htmlFor="subject">Subject</Label>
-                      <Input
-                        id="subject"
-                        name="subject"
-                        value={formData.subject}
-                        onChange={handleChange}
-                        placeholder="Project inquiry"
-                      />
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label htmlFor="message">Message *</Label>
-                      <Textarea
-                        id="message"
-                        name="message"
-                        value={formData.message}
-                        onChange={handleChange}
-                        placeholder="Tell us about your project..."
-                        rows={6}
-                        required
-                      />
-                    </div>
-
-                    <Button type="submit" size="lg" disabled={loading} className="w-full md:w-auto">
-                      {loading ? (
-                        'Sending...'
-                      ) : (
-                        <>
-                          Send Message
-                          <Send className="ml-2 w-4 h-4" />
-                        </>
-                      )}
-                    </Button>
-                  </form>
+                    {item.href ? (
+                      <a href={item.href} className="text-muted-foreground hover:text-primary">
+                        {item.content}
+                      </a>
+                    ) : (
+                      <p className="text-muted-foreground">{item.content}</p>
+                    )}
+                  </div>
                 </CardContent>
               </Card>
-            </div>
+            ))}
           </div>
-        </div>
-      </section>
 
-      {/* FAQ */}
-      <section className="py-24 bg-muted/30">
-        <div className="container-custom text-center">
-          <h2 className="heading-2 mb-4">Prefer a Call?</h2>
-          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Schedule a free 30-minute consultation to discuss your project requirements.
-          </p>
-          <Button size="lg" variant="outline" asChild>
-            <a href="https://calendly.com" target="_blank" rel="noopener noreferrer">
-              Schedule a Call
-            </a>
-          </Button>
+          {/* FORM */}
+          <div className="lg:col-span-2">
+            <Card>
+              <CardContent className="p-8">
+
+                <h2 className="heading-3 mb-6">Send us a Message</h2>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+
+                  <input
+                    type="text"
+                    name="website"
+                    value={formData.website}
+                    onChange={handleChange}
+                    className="hidden"
+                    tabIndex={-1}
+                    autoComplete="off"
+                  />
+
+                  {/* NAME + EMAIL */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <Label>Name *</Label>
+                      <Input name="name" value={formData.name} onChange={handleChange} required />
+                    </div>
+
+                    <div>
+                      <Label>Email *</Label>
+                      <Input name="email" type="email" value={formData.email} onChange={handleChange} required />
+                    </div>
+                  </div>
+
+                  {/* PHONE + SERVICE */}
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <Label>Phone</Label>
+                      <Input name="phone" value={formData.phone} onChange={handleChange} />
+                    </div>
+
+                    <div>
+                      <Label>Service</Label>
+                      <Select
+                        value={formData.service}
+                        onValueChange={(value) =>
+                          setFormData((prev) => ({ ...prev, service: value }))
+                        }
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select service" />
+                        </SelectTrigger>
+
+                        <SelectContent>
+                          {services.map((s) => (
+                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* SUBJECT */}
+                  <div>
+                    <Label>Subject</Label>
+                    <Input name="subject" value={formData.subject} onChange={handleChange} />
+                  </div>
+
+                  {/* MESSAGE */}
+                  <div>
+                    <Label>Message *</Label>
+                    <Textarea name="message" rows={6} value={formData.message} onChange={handleChange} required />
+                  </div>
+
+                  {/* BUTTON */}
+                  <Button type="submit" size="lg" disabled={loading}>
+                    {loading ? 'Sending...' : <>Send Message <Send className="ml-2 w-4 h-4" /></>}
+                  </Button>
+
+                </form>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </section>
     </div>
